@@ -1,0 +1,4 @@
+/node_modules
+package-lock.json
+server/config/production.json
+server/config/default.json
