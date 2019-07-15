@@ -4,6 +4,7 @@ const auth = require("../../middleware/auth")
 const { check, validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const config = require("config");
+const bcrypt = require("bcryptjs");
 
 const User = require('../../models/User');
 
@@ -55,18 +56,12 @@ router.post(
         if (!user) {
           res.status(400).json({ errors: [{ msg: "Invalid Credentials" }] });
         }
-  
-        user = new User({
-          name,
-          email,
-          password
-        });
-  
-        const salt = await bcrypt.genSalt(10);
-  
-        user.password = await bcrypt.hash(password, salt);
-  
-        await user.save();
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if(isMatch){
+            res.status(400).json({ errors: [{ msg: "Invalid Credentials" }] });
+        }
   
         const payload = {
           user: {
