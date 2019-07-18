@@ -9,8 +9,8 @@ const connectDB = async () => {
   try {
     await mongoose.connect(db, {
       useNewUrlParser: true,
-      useCreateIndex: true
-      // useFindAndModify: false
+      useCreateIndex: true,
+      useFindAndModify: false
     });
 
     console.log(chalk.bgCyan.black("MongoDB Connected... "));
