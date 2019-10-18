@@ -16,6 +16,7 @@ app.use("/api/users", require("./routes/api/users"))
 app.use("/api/equipmentPosts", require("./routes/api/equipmentPosts"))
 app.use("/api/profile", require("./routes/api/profile"))
 app.use("/api/trailPosts", require("./routes/api/trailPosts"))
+app.use("/api/posts", require("./routes/api/posts"))
 
 // app.use("/", (req, res) => {
 //     res.send("Hey rich, its Maddie. How have you been!?")
