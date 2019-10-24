@@ -28,6 +28,11 @@ router.post(
       check("description", "Description is required")
         .not()
         .isEmpty()
+    ],
+    [
+      check("trailLength", "Trail length must be a number")
+      .isNumeric()
+
     ]
   ],
   async (req, res) => {

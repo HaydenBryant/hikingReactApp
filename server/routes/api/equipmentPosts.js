@@ -47,8 +47,8 @@ router.post(
       const newEquipmentPost = new EquipmentPost({
         company: req.body.company,
         equipmentType: req.body.equipmentType,
-        company: req.body.company,
-        company: req.body.company,
+        equipmentName: req.body.equipmentName,
+        review: req.body.review,
         name: user.name,
         avatar: user.avatar,
         user: req.user.id
