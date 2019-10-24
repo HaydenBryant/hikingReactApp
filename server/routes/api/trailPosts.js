@@ -39,7 +39,7 @@ router.post(
     try {
       const user = await User.findById(req.user.id).select("-password");
 
-      const newTrailPost = new Post({
+      const newTrailPost = new TrailPost({
         trailName: req.body.trailName,
         location: req.body.location,
         description: req.body.description,

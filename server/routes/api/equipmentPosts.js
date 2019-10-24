@@ -3,19 +3,34 @@ const router = express.Router();
 const { check, validationResult } = require("express-validator/check");
 const auth = require("../../middleware/auth");
 
-const Post = require("../../models/Post");
+const EquipmentPost = require("../../models/EquipmentPost");
 const Profile = require("../../models/Profile");
 const User = require("../../models/User");
 
-//@route Post api/posts
-//@desc Create a post
+//@route Post api/equipmentPosts
+//@desc Create an equipment post
 //@access Private
 router.post(
   "/",
   [
     auth,
     [
-      check("text", "Text is required")
+      check("company", "Company is required")
+        .not()
+        .isEmpty()
+    ],
+    [
+      check("equipmentType", "Equipment type is required")
+        .not()
+        .isEmpty()
+    ],
+    [
+      check("equipmentName", "Equipment name is required")
+        .not()
+        .isEmpty()
+    ],
+    [
+      check("review", "Review is required")
         .not()
         .isEmpty()
     ]
@@ -29,16 +44,19 @@ router.post(
     try {
       const user = await User.findById(req.user.id).select("-password");
 
-      const newPost = new Post({
-        text: req.body.text,
+      const newEquipmentPost = new EquipmentPost({
+        company: req.body.company,
+        equipmentType: req.body.equipmentType,
+        company: req.body.company,
+        company: req.body.company,
         name: user.name,
         avatar: user.avatar,
         user: req.user.id
       });
 
-      const post = await newPost.save();
+      const equipmentPost = await newEquipmentPost.save();
 
-      res.json(post);
+      res.json(equipmentPost);
     } catch (err) {
       console.error(err.message);
       res.status(500).send("Server Error");
@@ -46,31 +64,31 @@ router.post(
   }
 );
 
-//@route GET api/posts
-//@desc Get all posts
+//@route GET api/equipmentPosts
+//@desc Get all equipment posts
 //@access Private
 router.get("/", auth, async (req, res) => {
   try {
-    const posts = await Post.find().sort({ date: -1 });
-    res.json(posts);
+    const equipmentPosts = await EquipmentPost.find().sort({ date: -1 });
+    res.json(equipmentPosts);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
   }
 });
 
-//@route GET api/posts/:id
-//@desc Get post by id
+//@route GET api/equipmentPosts/:id
+//@desc Get equipment post by id
 //@access Private
 router.get("/:id", auth, async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const equipmentPost = await EquipmentPost.findById(req.params.id);
 
-    if (!post) {
+    if (!equipmentPost) {
       return res.status(404).json({ msg: "Post not found" });
     }
 
-    res.json(post);
+    res.json(equipmentPost);
   } catch (err) {
     console.error(err.message);
     if (err.kind === "ObjectId") {
@@ -80,23 +98,23 @@ router.get("/:id", auth, async (req, res) => {
   }
 });
 
-// @route    DELETE api/posts/:id
-// @desc     Delete a post
+// @route    DELETE api/equipmentPosts/:id
+// @desc     Delete an equipment post
 // @access   Private
 router.delete("/:id", auth, async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const equipmentPost = await EquipmentPost.findById(req.params.id);
 
-    if (!post) {
+    if (!equipmentPost) {
       return res.status(404).json({ msg: "Post not found" });
     }
 
     // Check user
-    if (post.user.toString() !== req.user.id) {
+    if (equipmentPost.user.toString() !== req.user.id) {
       return res.status(401).json({ msg: "User not authorized" });
     }
 
-    await post.remove();
+    await equipmentPost.remove();
 
     res.json({ msg: "Post removed" });
   } catch (err) {
@@ -108,64 +126,64 @@ router.delete("/:id", auth, async (req, res) => {
   }
 });
 
-// @route    PUT api/posts/like/:id
-// @desc     Like a post
+// @route    PUT api/equipmentPosts/like/:id
+// @desc     Like an equipment post
 // @access   Private
 router.put("/like/:id", auth, async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const equipmentPost = await EquipmentPost.findById(req.params.id);
 
     // Check if the post has already been liked
     if (
-      post.likes.filter(like => like.user.toString() === req.user.id).length > 0
+      equipmentPost.likes.filter(like => like.user.toString() === req.user.id).length > 0
     ) {
       return res.status(400).json({ msg: "Post already liked" });
     }
 
-    post.likes.unshift({ user: req.user.id });
+    equipmentPost.likes.unshift({ user: req.user.id });
 
-    await post.save();
+    await equipmentPost.save();
 
-    res.json(post.likes);
+    res.json(equipmentPost.likes);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
   }
 });
 
-// @route    PUT api/posts/unlike/:id
-// @desc     Unlike a post
+// @route    PUT api/equipmentPosts/unlike/:id
+// @desc     Unlike an equipment post
 // @access   Private
 router.put("/unlike/:id", auth, async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const equipmentPost = await EquipmentPost.findById(req.params.id);
 
     // Check if the post has already been liked
     if (
-      post.likes.filter(like => like.user.toString() === req.user.id).length ===
+      equipmentPost.likes.filter(like => like.user.toString() === req.user.id).length ===
       0
     ) {
       return res.status(400).json({ msg: "Post has not yet been liked" });
     }
 
     // Get remove index
-    const removeIndex = post.likes
+    const removeIndex = equipmentPost.likes
       .map(like => like.user.toString())
       .indexOf(req.user.id);
 
-    post.likes.splice(removeIndex, 1);
+    equipmentPost.likes.splice(removeIndex, 1);
 
-    await post.save();
+    await equipmentPost.save();
 
-    res.json(post.likes);
+    res.json(equipmentPost.likes);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
   }
 });
 
-//@route Post api/posts/comment/:id
-//@desc Comment on a post
+//@route Post api/equipmentPosts/comment/:id
+//@desc Comment on an equipment post
 //@access Private
 router.post(
   "/comment/:id",
@@ -186,7 +204,7 @@ router.post(
     try {
       const user = await User.findById(req.user.id).select("-password");
 
-      const post = await Post.findById(req.params.id);
+      const equipmentPost = await EquipmentPost.findById(req.params.id);
 
       const newComment = ({
         text: req.body.text,
@@ -195,11 +213,11 @@ router.post(
         user: req.user.id
       });
 
-      post.comments.unshift(newComment);
+      equipmentPost.comments.unshift(newComment);
 
-      await post.save();
+      await equipmentPost.save();
 
-      res.json(post.comments);
+      res.json(equipmentPost.comments);
     } catch (err) {
       console.error(err.message);
       res.status(500).send("Server Error");
@@ -207,15 +225,15 @@ router.post(
   }
 );
 
-// @route    DELETE api/posts/comment/:id/:comment_id
+// @route    DELETE api/equipmentPosts/comment/:id/:comment_id
 // @desc     Delete comment
 // @access   Private
 router.delete('/comment/:id/:comment_id', auth, async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const equipmentPost = await EquipmentPost.findById(req.params.id);
 
     // Pull out comment
-    const comment = post.comments.find(
+    const comment = equipmentPost.comments.find(
       comment => comment.id === req.params.comment_id
     );
 
@@ -230,15 +248,15 @@ router.delete('/comment/:id/:comment_id', auth, async (req, res) => {
     }
 
     // Get remove index
-    const removeIndex = post.comments
+    const removeIndex = equipmentPost.comments
       .map(comment => comment.id)
       .indexOf(req.params.comment_id);
 
-    post.comments.splice(removeIndex, 1);
+    equipmentPost.comments.splice(removeIndex, 1);
 
-    await post.save();
+    await equipmentPost.save();
 
-    res.json(post.comments);
+    res.json(equipmentPost.comments);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
