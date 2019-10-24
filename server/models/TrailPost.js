@@ -16,7 +16,6 @@ const PostSchema = new Schema({
     },
     trailLength: {
         type: Number,
-        required: true
     },
     description: {
         type: String,
