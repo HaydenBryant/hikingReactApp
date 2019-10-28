@@ -32,7 +32,6 @@ router.post(
     [
       check("trailLength", "Trail length must be a number")
       .isNumeric()
-
     ]
   ],
   async (req, res) => {
